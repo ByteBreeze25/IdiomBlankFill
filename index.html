@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>成语填空</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 20px;
+            text-align: center;
+        }
+        .idiom {
+            font-size: 32px;
+            margin: 30px 0;
+            letter-spacing: 10px;
+        }
+        .blank {
+            display: inline-block;
+            width: 40px;
+            border-bottom: 2px solid #333;
+            margin: 0 5px;
+        }
+        .keyboard {
+            margin: 20px 0;
+        }
+        .key {
+            display: inline-block;
+            width: 40px;
+            height: 40px;
+            line-height: 40px;
+            margin: 5px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        .key:hover {
+            background: #f0f0f0;
+        }
+        button {
+            padding: 10px 20px;
+            margin: 10px;
+            font-size: 16px;
+        }
+        .result {
+            margin: 20px 0;
+            font-size: 20px;
+            min-height: 30px;
+        }
+        .correct {
+            color: green;
+        }
+        .wrong {
+            color: red;
+        }
+    </style>
+</head>
+<body>
+    <h1>成语填空</h1>
+    <div class="idiom" id="idiom-display"></div>
+    <div class="keyboard" id="keyboard"></div>
+    <div>
+        <button id="submit-btn">提交答案</button>
+        <button id="next-btn">下一题</button>
+    </div>
+    <div class="result" id="result"></div>
+
+    <script>
+        // 成语库
+        const idioms = [
+            "一帆风顺", "二龙戏珠", "三阳开泰", "四季平安", "五福临门",
+            "六六大顺", "七星高照", "八方来财", "九九归一", "十全十美"
+        ];
+        
+        let currentIdiom = "";
+        let blankIndex = 0;
+        let userAnswer = "";
+        
+        // 初始化游戏
+        function initGame() {
+            // 随机选择一个成语
+            const randomIndex = Math.floor(Math.random() * idioms.length);
+            currentIdiom = idioms[randomIndex];
+            
+            // 随机选择一个位置作为空白
+            blankIndex = Math.floor(Math.random() * currentIdiom.length);
+            
+            // 渲染成语显示
+            renderIdiom();
+            
+            // 生成虚拟键盘
+            generateKeyboard();
+            
+            // 重置状态
+            userAnswer = "";
+            document.getElementById("result").textContent = "";
+            document.getElementById("result").className = "result";
+        }
+        
+        // 渲染成语显示
+        function renderIdiom() {
+            const display = document.getElementById("idiom-display");
+            display.innerHTML = "";
+            
+            for (let i = 0; i < currentIdiom.length; i++) {
+                const span = document.createElement("span");
+                if (i === blankIndex) {
+                    if (userAnswer) {
+                        span.textContent = userAnswer;
+                    } else {
+                        span.className = "blank";
+                    }
+                } else {
+                    span.textContent = currentIdiom[i];
+                }
+                display.appendChild(span);
+            }
+        }
+        
+        // 生成虚拟键盘
+        function generateKeyboard() {
+            const keyboard = document.getElementById("keyboard");
+            keyboard.innerHTML = "";
+            
+            // 正确答案字符
+            const correctChar = currentIdiom[blankIndex];
+            
+            // 随机字符库
+            const chars = "一二三四五六七八九十百千万大小多少前后左右出入有无";
+            
+            // 生成键盘字符（包含正确答案和随机字符）
+            const keyChars = [correctChar];
+            while (keyChars.length < 12) {
+                const randomChar = chars[Math.floor(Math.random() * chars.length)];
+                if (!keyChars.includes(randomChar)) {
+                    keyChars.push(randomChar);
+                }
+            }
+            
+            // 打乱顺序
+            keyChars.sort(() => Math.random() - 0.5);
+            
+            // 创建键盘按钮
+            keyChars.forEach(char => {
+                const key = document.createElement("div");
+                key.className = "key";
+                key.textContent = char;
+                key.addEventListener("click", () => {
+                    userAnswer = char;
+                    renderIdiom();
+                });
+                keyboard.appendChild(key);
+            });
+        }
+        
+        // 检查答案
+        function checkAnswer() {
+            const result = document.getElementById("result");
+            if (userAnswer === currentIdiom[blankIndex]) {
+                result.textContent = "正确！";
+                result.className = "result correct";
+            } else {
+                result.textContent = `错误！正确答案是：${currentIdiom}`;
+                result.className = "result wrong";
+            }
+        }
+        
+        // 绑定事件
+        document.getElementById("submit-btn").addEventListener("click", checkAnswer);
+        document.getElementById("next-btn").addEventListener("click", initGame);
+        
+        // 初始化游戏
+        initGame();
+    </script>
+</body>
+</html>
